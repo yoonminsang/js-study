@@ -36,6 +36,20 @@ delete copy.a;
 console.log(obj);  // => {b: 20}
 ```
 
+## 스코프
+
+- 정의 : 식별자가 유효한 범위(전역, 지역)
+
+스코프 체인 : 스코프가 계층적으로 연결된 것
+
+스코프는 함수의 중첩에 의해 계층적 구조를 갖는다.
+
+변수를 참조할 때 자바스크립트 엔진은 스코프 체인을 통해 변수를 참조하는 코드의 스코프에서 시작하여 상위 스코프 방향으로 선언된 변수를 검색한다.
+
+동적 스코프 : 함수를 어디서 호출했는지에 따라 함수의 스코프를 결정
+
+렉시컬 스코프 : 함수를 어디서 정의했는지에 따라 함수의 상위 스코프를 결정(js)
+
 ## 전역변수의 문제점
 
 1. 암묵적 결합 : 전역변수를 사용하고 다음 스코프에서 같은 변수명을 사용할 때 원하지 않는 결합을 하는 경우가 존재
@@ -201,17 +215,63 @@ ajax 통신을 생각해보자. 페이스북에 접속하면 로그인 정보를
 
 배열에서 흔하게 사용하는 sort, forEach, map, filter 등이 고차함수의 대표적인 예시다. 고차함수와 비슷한 개념으로 리액트에서 고차 컴포넌트를 사용하기도 한다.
 
-## 스코프
-
-## 실행 컨텍스트
-
 ## this
 
-## 클로저
+자바스크립트에서 this는 함수를 호출하는 방법에 의해 결정된다.
+
+1. 일반함수 : this는 전역객체(웹이라면 window)를 가리킨다.
+
+```
+function hi(){
+    console.log(this);
+}
+hi();
+// Window {0: Window, window: Window, self: Window, document: document, name: '', location: Location, …}
+```
+
+2. 메서드 : this는 호출한 객체를 가리킨다.
+
+```
+const obj={
+    a:10,
+    b(){
+        console.log(this);
+    },
+    c:function(){
+        console.log(this);
+    }
+}
+
+obj.b()
+// {a: 10, b: ƒ, c: ƒ}
+
+obj.c()
+// {a: 10, b: ƒ, c: ƒ}
+```
+
+3. 생성자 함수 : 생성자 함수가 생성한 인스턴스를 가리킨다.
+
+4. 화살표 함수 : 외부 스코프의 this를 가리킨다.
+
+```
+function Animal(name){
+    this.name=name;
+    console.log(this);
+}
+
+const dog=new Animal('dog')
+// Animal {name: 'dog'}
+```
+
+5. apply, call, bind : 인수에 의해 결정
 
 ## 화살표함수
 
 ## call, apply, bind
+
+## 실행 컨텍스트
+
+## 클로저
 
 ## 이벤트(버블링, 캡쳐링, 위임)
 
