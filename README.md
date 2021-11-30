@@ -368,13 +368,258 @@ person.hi(function () {
 
 -- 출처 : https://ui.toast.com/weekly-pick/ko_20160826
 
-## AJAX와 XMLHTTPRequest
+## AJAX(Asynchronous JavaScript and XML)
+
+자바스크립트를 사용하여 브라우저가 서버에게 비동기 방식으로 데이터를 요청하고, 서버가 응답한 데이터를 수신하여 웹페이지를 동적으로 갱신하는 프로그래밍 방식이다.
+
+1. 변경할 부분을 갱신하는 데 필요한 데이터만 서버로부터 전송받기 때문에 불필요한 데이터 통신이 발생하지 않는다.
+
+2. 변경할 필요가 없는 부분은 다시 렌더링하지 않는다. 따라서 화면이 순간적으로 깜박이는 현상이 발생하지 않는다.
+
+3. 클라이언트와 서버와의 통신이 비동기 방식으로 동작하기 때문에 서버에게 요청을 보낸 이후 블로킹이 발생하지 않는다.
+
+## XMLHTTPRequest
+
+브라우저는 주소창이나 HTML의 form, a태그를 통해 HTTP 요청 전송 기능을 기본 제공한다. 자바스크립트를 사용하여 HTTP 요청을 전송하려면 XMLHttpRequest 객체를 사용한다. Web API인 XMLHttpRequest 객체는 HTTP 요청 전송과 HTTP 응답 수신을 위한 다양한 메서드와 프로퍼티를 제공한다.
+
+## fetch vs axios
+
+fetch는 es6에서 추가된 XMLHTTPRequest를 간편하게 사용하기 위한 api이다. promise도 지원한다.
+
+axios도 fetch와 기능적으로는 크게 다르지 않다. 하지만 몇가지 차이점이 존재한다.
+
+1. fetch는 es6에 내장되어 있지만 axios는 설치가 필요하다.
+
+2. fetch는 es6에 내장되어 있기 때문에 브라우저 호환성이 좋지 않다.(폴리필을 고려하더라도) 하지만 react native 같은 경우에는 업데이트 버전을 못 따라오기 때문에 fetch를 사용한다고 한다.(나는 native에 대해 무지해서 정확히는 모른다)
+
+3. axios는 fetch에 비해 추가적인 기능들이 있고 개발자를 고려한 부분들이 많다. 예를들면 자동 json 변환이나 보안기능, request 취소 타임아웃, http request에 따른 throw err를 지원한다. 나도 fetch를 사용할때 axios에서 자동으로 지원하는 기능들이 되지 않아서 당황한 기억이 있다.
 
 ## REST API
 
+REST는 HTTP를 기반으로 클라이언트가 서버의 리소스에 접근하는 방식을 규정한 아키텍처고, REST API는 REST를 기반으로 서비스 API를 구현한 것을 의미한다.
+
+REST API의 구성 : 자원(URI(엔드포인트)), 행위(HTTP 요청 메서드), 표현(페이로드)
+
+### RESTful
+
+제대로 찾아보니 좀 어렵다. 기본적으로는 REST 방식을 잘 지키면 restful하다고 한다. 예를들면 행위가 post인데 데이터를 업데이트를 하거나 uri를 getpost로 구현하면 restful하지 않다. 아래에 참고한 블로그의 내용을 적어두었다. 후에 정리하겠다.
+
+1. Server-Client(서버-클라이언트 구조)
+   자원이 있는 쪽이 Server, 자원을 요청하는 쪽이 Client가 된다.
+   REST Server: API를 제공하고 비즈니스 로직 처리 및 저장을 책임진다.
+   Client: 사용자 인증이나 context(세션, 로그인 정보) 등을 직접 관리하고 책임진다.
+   서로 간 의존성이 줄어든다.
+2. Stateless(무상태)
+   HTTP 프로토콜은 Stateless Protocol이므로 REST 역시 무상태성을 갖는다.
+   Client의 context를 Server에 저장하지 않는다.
+   즉, 세션과 쿠키와 같은 context 정보를 신경쓰지 않아도 되므로 구현이 단순해진다.
+   Server는 각각의 요청을 완전히 별개의 것으로 인식하고 처리한다.
+   각 API 서버는 Client의 요청만을 단순 처리한다.
+   즉, 이전 요청이 다음 요청의 처리에 연관되어서는 안된다.
+   물론 이전 요청이 DB를 수정하여 DB에 의해 바뀌는 것은 허용한다.
+   Server의 처리 방식에 일관성을 부여하고 부담이 줄어들며, 서비스의 자유도가 높아진다.
+3. Cacheable(캐시 처리 가능)
+   웹 표준 HTTP 프로토콜을 그대로 사용하므로 웹에서 사용하는 기존의 인프라를 그대로 활용할 수 있다.
+   즉, HTTP가 가진 가장 강력한 특징 중 하나인 캐싱 기능을 적용할 수 있다.
+   HTTP 프로토콜 표준에서 사용하는 Last-Modified 태그나 E-Tag를 이용하면 캐싱 구현이 가능하다.
+   대량의 요청을 효율적으로 처리하기 위해 캐시가 요구된다.
+   캐시 사용을 통해 응답시간이 빨라지고 REST Server 트랜잭션이 발생하지 않기 때문에 전체 응답시간, 성능, 서버의 자원 이용률을 향상시킬 수 있다.
+4. Layered System(계층화)
+   Client는 REST API Server만 호출한다.
+   REST Server는 다중 계층으로 구성될 수 있다.
+   API Server는 순수 비즈니스 로직을 수행하고 그 앞단에 보안, 로드밸런싱, 암호화, 사용자 인증 등을 추가하여 구조상의 유연성을 줄 수 있다.
+   또한 로드밸런싱, 공유 캐시 등을 통해 확장성과 보안성을 향상시킬 수 있다.
+   PROXY, 게이트웨이 같은 네트워크 기반의 중간 매체를 사용할 수 있다.
+5. Code-On-Demand(optional)
+   Server로부터 스크립트를 받아서 Client에서 실행한다.
+   반드시 충족할 필요는 없다.
+6. Uniform Interface(인터페이스 일관성)
+   URI로 지정한 Resource에 대한 조작을 통일되고 한정적인 인터페이스로 수행한다.
+   HTTP 표준 프로토콜에 따르는 모든 플랫폼에서 사용이 가능하다.
+   특정 언어나 기술에 종속되지 않는다.
+
+[참조 블로그](https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html)
+
 ## 프로미스
 
+### 프로미스의 배경, 설명
+
+프로미스는 자바스크립트 비동기 처리에 사용되는 객체이다. 이전에 비동기를 처리할 때는 콜백함수를 사용했다. 그런데 콜백함수가 많아지면 굉장히 복잡한 코드가 된다. 이를 해결하기 위해서 프로미스가 나왔다. 프로미스를 사용하면 마치 동기 메서드처럼 값을 반환할 수 있다. 다만 최종결과를 반환하지는 않는다.
+
+프로미스는 pending, fullfilled, rejected 상태를 가진다. 프로미스는 resolve, reject를 인자로 가진다. resolve를 하면 fullfilled가 return되고 reject를 하면 rejected가 된다.
+
+ex)
+
+```
+const number = new Promise((resolve) => {
+  setTimeout(() => resolve('success'));
+});
+console.log(number); // Promise { <pending> }
+number.then((v) => console.log(v)); // success
+
+const number2 = new Promise((resolve) => {
+  setTimeout(() => setTimeout(() => resolve('success')));
+});
+number2.then((v1) => v1).then((v2) => console.log(v2)); // success
+
+const error = new Promise((resolve, reject) => {
+  setTimeout(() => reject('fail'));
+});
+
+error.then((v) => console.log(v)).catch((err) => console.error(err));
+```
+
+### 프로미스 메서드
+
+- Promise.all : iterable 내의 모든 프로미스가 이행한 뒤 이행한다. 어떤 프로미스가 거부하면 즉시 거부하는 프로미스를 반환한다. 특이점으로는 iterable의 순서를 보장한다.
+
+```
+const promise1 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(1);
+    resolve(1);
+  })
+);
+const promise2 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(2);
+    resolve(2);
+  })
+);
+const promise3 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(3);
+    resolve(3);
+  })
+);
+Promise.all([promise1, promise2, promise3]).then((v) => {
+  console.log(v);
+});
+
+1
+2
+3
+[ 1, 2, 3 ]
+
+const promise1 = new Promise((resolve) => setTimeout(() => resolve(1)));
+const promise2 = new Promise((resolve, reject) =>
+  setTimeout(() => reject('fail'))
+);
+const promise3 = new Promise((resolve) => setTimeout(() => resolve(3)));
+Promise.all([promise1, promise2, promise3])
+  .then((v) => {
+    console.log(v);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+// fail
+```
+
+- Promise.race : iterable 내의 어떤 프로미스가 이행하거나 거부하는 즉시 스스로 이행하거나 거부하는 프로미스를 반환한다. 즉 순서를 보장하지 않는다. 순서를 보장할 필요 없는 경우는 all보다 race를 사용하는 것이 좋다.
+
+```
+const promise1 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(1);
+    resolve(1);
+  }, 200)
+);
+const promise2 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(2);
+    resolve(2);
+  }, 100)
+);
+const promise3 = new Promise((resolve) =>
+  setTimeout(() => {
+    console.log(3);
+    resolve(3);
+  }, 500)
+);
+Promise.race([promise1, promise2, promise3]).then((v) => {
+  console.log('v', v);
+});
+
+2
+v 2
+1
+3
+```
+
+- Promise.reject : 거부하는 프로미스 객체를 반환한다.
+
+- Promise.resolve : 주어진 값으로 이행하는 Promise 객체를 반환한다.
+
+```
+const promise1 = Promise.resolve('success');
+promise1.then((v) => {
+  console.log(v);
+});
+success
+
+const promise2 = Promise.reject('fail');
+promise2.catch((err) => {
+  console.log(err);
+});
+fail
+```
+
 ## async await
+
+비동기 함수를 사용할 때 콜백함수를 사용하고 이에 불편함을 느껴서 프로미스가 나왔다. 그런데 이것도 사용하다보니 조금 불편하다. then then then이 콜백헬까지는 아니지만 조금 불편하다. 그래서 이번에는 asyn await가 나왔다.
+
+### async
+
+먼저 async 함수를 만들어야 한다. async 함수에서 return한 값은 promise를 return 한다. fullfil promise가 반환되기 때문에 then을 사용해야 한다.
+
+```
+async function hi() {
+  return 'hi';
+}
+console.log(hi());
+Promise { 'hi' }
+
+hi().then((v) => {
+  console.log(v);
+});
+hi
+```
+
+### await
+
+이제 비동기 함수를 await와 함께 사용하면 엄청난 장점이 보인다. await는 promise 기반 함수 앞에 놓을 수 있다. 그러면 promise가 fulfil될 때 까지 잠시 중단하고 결과를 반환하다. 그리고 실행을 기다리는 다른 코드들은 중지되지 않고 실행된다.(async 함수 내부에서만 중지되고 다른 코드는 중지x) await 키워드는 웹 API를 포함하여 Promise를 반환하는 함수를 호출할 때 사용할 수 있다.
+
+```
+const resolveA = () => new Promise((resolve) => setTimeout(() => resolve('a')));
+const resolveB = () => new Promise((resolve) => setTimeout(() => resolve('b')));
+const resolveC = () => new Promise((resolve) => setTimeout(() => resolve('c')));
+
+async function asyncEx() {
+  const a = await resolveA();
+  const b = await resolveB();
+  const c = await resolveC();
+  console.log(a, b, c);
+}
+
+asyncEx();
+```
+
+## undefined vs null
+
+### undefined
+
+- 값을 할당하지 않은 변수
+- parameter가 있는 함수를 parameter의 개수보다 작은 argument로 호출했을 때 변수를 전달받지 않은 값
+- 함수가 값을 return 하지 않을 때
+
+### null
+
+- 의도적인 비어있음
+
+결론 : 코드를 작성할 때는 null을 사용하는 것이 좋다. 하지만 유저 정보같이 서버에서 받아오기 전에 존재하는 상태는 undefined로 할당하는게 좋지 않을까?? 보편적으로는 null을 사용하는 것 같다.
+
+## 마이크로 테스크 큐 vs 매크로 테스크 큐
 
 ## 제너레이터
 
