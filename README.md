@@ -605,6 +605,57 @@ async function asyncEx() {
 asyncEx();
 ```
 
+## 마이크로 테스크 큐 vs 매크로 테스크 큐
+
+자바스크립트의 이벤트 루프에서 테스크 큐를 생각해보자. 테스크 큐에는 마이크로 테스크큐와 매크로 테스크큐가 있다.
+
+### 테스크 큐(마이크로, 매크로) 동작 방식
+
+1. 현재 호출 스택에 있는 모든 함수가 실행된다. 값을 반환하면 스택에서 pop된다.
+2. 호출 스택이 비어 있으면 대기중인 모든 마이크로 태스크가 호출 스택에 하나씩 push한다.
+3. 호출 슽택과 마이크로 작업 대기열이 모우 비어있으면 이벤트 루프는 매크로 큐를 확인하고 존재한다면 호출 스택에 push한다.
+
+- 마이크로 테스크 큐에 넣는 함수
+
+  - process.nextTick
+  - Promise
+  - Object.observe
+  - MutationObserver
+
+- 매크로 테스크 큐에 넣는 함수
+  - setTimeout
+  - setInterval
+  - setImmediate
+  - requestAnimationFrame
+  - I/O
+  - UI 렌더링
+
+ex)
+
+```
+console.log('start');
+setTimeout(() => {
+  console.log(1);
+}, 0);
+Promise.resolve()
+  .then(() => {
+    console.log(2);
+  })
+  .then(() => {
+    console.log(3);
+  });
+console.log('end');
+start
+end
+2
+3
+1
+```
+
+```
+
+```
+
 ## undefined vs null
 
 ### undefined
@@ -618,8 +669,6 @@ asyncEx();
 - 의도적인 비어있음
 
 결론 : 코드를 작성할 때는 null을 사용하는 것이 좋다. 하지만 유저 정보같이 서버에서 받아오기 전에 존재하는 상태는 undefined로 할당하는게 좋지 않을까?? 보편적으로는 null을 사용하는 것 같다.
-
-## 마이크로 테스크 큐 vs 매크로 테스크 큐
 
 ## 제너레이터
 
