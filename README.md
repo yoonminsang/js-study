@@ -323,6 +323,68 @@ person.hi(function () {
 
 ## 실행 컨텍스트
 
+### 실행 컨텍스트 정의
+
+실행 컨텍스트는 실행할 코드에 제공할 환경 정보들을 모아놓은 객체이다.
+
+### 실행 컨텍스트 생성되는 시점
+
+1. 자동으로 생성되는 전역 컨텍스트
+2. eval 함수 실행
+3. 함수 실행
+4. {}코드 블록 사용시에 생성된다.
+
+### 실행 컨텍스트 구성
+
+- VariableEnvironment : 최초의 스냅샷의 개념으로 변경되는 컨텍스트 정보에 대해 업데이트를 하지 않는다.
+
+- LexicalEnvironment : envrionmentRecord 와 outerEnvironmentReference 의 객체를 가지고 있다
+
+- ThisBinding : 상황에 따라 적절한 this를 지정한다.
+
+#### envrionmentRecord
+
+현재 컨텍스트와 관련된 코드의 식별자 정보들이 저장된다.
+
+- 매개변수 식별자
+- 함수 자체
+- 함수 내부의 식별자
+
+코드가 실행되기 전에 식별자를 알기 때문에 자바스크립트에서 호이스팅이 일어난다는 말을 하는 것이다.
+
+#### outerEnvironmentReference
+
+현재 호출된 함수가 선언될 당시의 LexicalEnvironment를 참조한다.(상위 LexicalEnvironment를 참조한다) 이것으로 scope chain이 가능해진다.
+
+scope는 식별자에 대한 유효범위이다. scope A의 내부에서 선언된 변수는 오직 A 내부에서만 접근할 수 있고 A의 외부에서 선언된 변수는 A의 외부, 내부에서 모두 접근할 수 있다.
+
+scope chain은 식별자의 유효범위를 안에서 바깥으로 차례차례 검색하는 것이다.
+
+ex)
+
+```
+// 전역 컨텍스트
+var x = 1; // window에 저장(this=window)
+const y = 2; // envrionmentRecorddp에 저장
+function foo(a) {
+  // foo 컨텍스트
+  var x = 10; // window에 저장(this=window)
+  const y = 20; // envrionmentRecorddp에 저장
+  function bar(b) {
+    // bar 컨텍스트
+    const z = 30; // envrionmentRecorddp에 저장
+    console.log(a, b, x, y, z);
+  }
+  bar(2); // bar가 실행될 때 foo의 LexcicalEnvironemnt를 outerEnvironmentReference로 참조
+}
+foo(1); // foo가 실행될 때 전역 컨텍스트의의 LexcicalEnvironemnt를 outerEnvironmentReference로 참조
+
+```
+
+참고블로그
+[https://junilhwang.github.io/TIL/Javascript/Domain/Execution-Context](https://junilhwang.github.io/TIL/Javascript/Domain/Execution-Context)
+[https://medium.com/crocusenergy/js-%EC%8B%A4%ED%96%89-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-2b8ab8da4f4](https://medium.com/crocusenergy/js-%EC%8B%A4%ED%96%89-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-2b8ab8da4f4)
+
 ## 클로저
 
 클로저는 함수와 그 함수가 선언된 렉시컬 환경과의 조합이다. 상태가 의도치 않게 변경되지 않도록 안전하게 은닉하고 특정 함수에게만 상태 변경을 허용하여 상태를 안전하게 변경하고 유지하기 위해 사용한다.(설명 추가 예정)
@@ -650,10 +712,6 @@ end
 2
 3
 1
-```
-
-```
-
 ```
 
 ## undefined vs null
