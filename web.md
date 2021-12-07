@@ -39,7 +39,7 @@ Cross-Origin Resource Sharing의 약자다. 다른 출처의 리소스를 공유
 
 네트워크 탭을 열어보면 preflight를 확인할 수 있다. 이게 3 hand shake인가?? 했었는데 cors때문에 요청이 있었던 것이다.
 
-### HTTP 요청 헤더
+### HTTP 응답 헤더
 
 나는 nodejs express를 이용하는데 cors 라이브러리를 이용하면 쉽게 해결할 수 있다. 하지만 당연하게도 직접 해줄수 있다. 근데 조금 귀찮기때문에 라이브러리를 사용한다.
 
