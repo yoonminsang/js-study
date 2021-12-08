@@ -22,6 +22,8 @@
 
 ### session
 
+세션이란 일정 시간동안 같은 사용자(브라우저)로부터 들어오는 일련의 요구를 하나의 상태로 보고 그 상태를 일정하게 유지시키는 기술이다. http 통신은 connectionless, statelss이기 때문에 상태를 유지할 수 없다. 그렇기 때문에 session 방식이 필요하다.
+
 우리는 웹사이트에서 로그인을 하고 페이지를 이동한다. 그런데 인증이 어떻게 유지되는걸까?? 가장 직관적으로 생각을 해보면 쿠키또는 로컬에 아이디 비밀번호를 저장하고 http 통신을 통해 서버에서 db를 통해 확인하면 된다. 당연히 비밀번호를 브라우저 내부에 저장하면 보안상에 문제가 생긴다. 그래서 과거에는(지금도) session 방식을 사용했다. 세션에는 store가 존재해서 그 store에 유저 정보를 저장한다. 더 세부적으로는 id에 세션 id를 value에 user id를 저장한다. 쉽게 말해서 브라우저에 저장하지 않고 웹서버에 저장한다고 생각하면 된다. 세션과 쿠키를 이용한 전체적인 인증방법을 살펴보자
 
 1. 프론트에서 로그인
@@ -63,6 +65,124 @@ jwt는 jsonwebtoken의 약자이고 header, payload, signature 세 부분으로 
 ## 디자인패턴
 
 ## debounce, throttle
+
+### debounce
+
+짧은 시간 간격으로 발생하는 이벤트를 그룹화해서 마지막에 한 번만 이벤트 핸들러가 호출되도록 한다.
+
+#### debounce 구현하기
+
+먼저 클로저 개념을 이용한다. 그리고 timerId가 존재하는 경우 clearTimeout을 하고 setTimeout을 실행하고 그 아이디 값을 timerId에 재할당하는 방식이다. if문은 사실 처음 실행하는 경우를 제외하고는 모두 실행된다. 즉 이전 setTimeout 이벤트를 clear하는 것이다. 만약 지정한 delay시간이 지났다면 clear를 해도 이미 함수가 실행되었기 때문에 상관이 없고 delay시간이 지나지 않았다면 이전 함수들은 실행되지 않는 것이다. 즉 delay시간보다 짧은 시간동안 아무리 많이 함수를 호출해도 콜백함수가 실행되지 않는다.
+
+```
+const debounce = (callback, delay) => {
+  let timerId;
+  return () => {
+    if (timerId) clearTimeout(timerId);
+    timerId = setTimeout(callback, delay);
+  };
+};
+```
+
+#### debounce 사용 예시
+
+검색자동완성에 사용된다.
+
+### throttle
+
+짧은 시간 간격으로 연속해서 발생하는 이벤트를 그룹화해서 일정시간 단위로 이벤트 핸들러가 호출되도록 호출 주기를 만든다.
+
+#### throttle 구현하기
+
+여기서도 클로저 개념을 이용한다. 위와는 다른점이 timerId가 존재한다면 return을 한다. 그리고 setTimeout함수의 첫번째 인자에 throttle의 첫번째 인자인 callback을 실행하고 timerId를 null로 할당한다. 이렇게되면 첫번째 이벤트가 발생하고 delay시간 이전에 클릭하게 된다면 if문의 조건에 걸려서 return하게 되고 그 다음 이벤트가 발생하지 않는다. 이렇게 보면 debounce와 다른점이 없어보이는데 0.5초의 delay가 있고 버튼을 0.1초 간격으로 클릭한다고 생각해보자. debounce를 적용하면 100만번 클릭해도 한번만 클릭이 될 것이다. 이제 throttle을 살펴보자. 첫번째는 콜백함수가 실행되고 두번째부터 다섯번째까지는 콜백함수가 실행되지 않는다. 그리고 0.5초가 지나는 순간 콜백함수가 실행되고 timerId가 null로 재할당된다. timerId가 null이기 때문에 여섯번째 클릭은 setTimeout함수가 실행된다.
+
+```
+const throttle = (callback, delay) => {
+  let timerId;
+  return () => {
+    if (timerId) return;
+    timerId = setTimeout(
+      () => {
+        callback();
+        timerId = null;
+      },
+      delay,
+    );
+  };
+};
+```
+
+#### throttle 사용 예시
+
+스크롤 이벤트에 사용된다.
+
+#### 버튼 클릭 예시
+
+```
+<!DOCTYPE html>
+<html>
+
+<body>
+  <button>click me</button>
+  <pre>일반 클릭 이벤트 카운터    <span class="normal-msg">0</span></pre>
+  <pre>디바운스 클릭 이벤트 카운터 <span class="debounce-msg">0</span></pre>
+  <pre>스로틀 클릭 이벤트 카운터   <span class="throttle-msg">0</span></pre>
+  <script>
+    const $button = document.querySelector('button');
+    const $normalMsg = document.querySelector('.normal-msg');
+    const $debounceMsg = document.querySelector('.debounce-msg');
+    const $throttleMsg = document.querySelector('.throttle-msg');
+
+    const debounce = (callback, delay) => {
+      let timerId;
+      return () => {
+        if (timerId) clearTimeout(timerId);
+        timerId = setTimeout(callback, delay);
+      };
+    };
+
+    const throttle = (callback, delay) => {
+      let timerId;
+      return () => {
+        if (timerId) return;
+        timerId = setTimeout(
+          () => {
+            callback();
+            timerId = null;
+          },
+          delay
+        );
+      };
+    };
+
+    $button.addEventListener('click', () => {
+      $normalMsg.textContent = +$normalMsg.textContent + 1;
+    });
+
+    $button.addEventListener(
+      'click',
+      debounce(() => {
+        $debounceMsg.textContent = +$debounceMsg.textContent + 1;
+      }, 500)
+    );
+
+    $button.addEventListener(
+      'click',
+      throttle(() => {
+        $throttleMsg.textContent = +$throttleMsg.textContent + 1;
+      }, 500)
+    );
+  </script>
+</body>
+
+</html>
+```
+
+- 출처 : 모던자바스크립트 deep dive
+
+### 실제 사용
+
+실제로는 위와같이 구현하기 보다는 lodash나 underscore, redux saga 등의 라이브러리에 있는 함수로 사용한다.
 
 ## 무한 스크롤 vs 페이징
 
