@@ -73,6 +73,109 @@ const ex = () => {
 
 리액트는 트리구조로 되어있는데 a트리의 한 부분과 b트리의 한 부분이 다르다면 거 아래 전체를 바꿔버린다. 이건 효율적인 방법이 아니다. 리액트가 그래도 빠르다고 하는 이유는 diff 알고리즘의 시간 복잡도를 줄였기 때문이다. 조금 효율적으로 사용하려면 react memo, usecallback, usememo등을 이용해 최적화를 해줘야 한다. 여기서도 무조건적으로 memo를 적용하는게 아니라 적절한 상황에만 memo를 해줘야한다. 이는 개발자의 역량에 달렸다.
 
-## 디자인 패턴과 상태관리
+## 코드 스플리팅
+
+웹팩에서는 모든 파일을 하나의 파일로 합친다. 이에 따른 장점도 있지만 프로젝트의 규모가 커지게되면 파일이 매우 커지게된다. 그러면 로딩이 오래 걸리고 트래픽이 많이 나오고 유저 경험도 나빠진다. 이를 해결하기 위해서 코드를 나누고 필요한 경우에만 불러오게 하는 것이 코드 스플리팅이다.
+
+### dynamic import
+
+먼저 유저가 원하는 경우에 import 하는 방법을 알아보자. 아직 표준 자바스크립트는 아니지만 stage 단계에 있는 dynamic import라는 문법이 있다. cra에서는 기본 설정이 되어 있지만 그렇지 않다면 직접 설정을 해줘야 한다.
+
+npm install babel-plugin-syntax-dynamic-import 으로 설치
+
+babel.config.json
+
+```
+{
+  "plugins": ["@babel/plugin-syntax-dynamic-import"]
+}
+```
+
+webpack.config.js
+
+```
+module.exports = {
+  entry: {
+    main: './src/app.js',
+  },
+  output: {
+    // `filename` provides a template for naming your bundles (remember to use `[name]`)
+    filename: '[name].bundle.js',
+    // `chunkFilename` provides a template for naming code-split bundles (optional)
+    chunkFilename: '[name].bundle.js',
+    // `path` is the folder where Webpack will place your bundles
+    path: './dist',
+    // `publicPath` is where Webpack will load your bundles from (optional)
+    publicPath: 'dist/'
+  }
+};
+```
+
+사용법은 어렵지 않다. 다음과 같이 사용하면 끝이다. onClick을 했을 때 비동기적으로 ./ex파일을 import하고 then으로 후처리를 해주면 된다.
+
+```
+const onClick = () => {
+  import('./ex').then(result => result.default());
+}
+```
+
+### React.lazy, Suspense
+
+코드 스플리팅을 위해 16.6버전부터 리액트에 내장된 기능으로 React.lazy와 Suspense가 있다. 이전에는 위에서처럼 dynamic import를 사용하고 가져온 값을 setState로 넣어주고 그 값을 렌더링해줘야 했다. 하지만 위의 기능이 나오고부터는 훨씬 편리해졌다.
+
+다음과 같이 손쉽게 바로 컴포넌트를 불러올 수 있다. visible이 true가 될때 split 파일을 불러오는 것이다. 그리고 로딩중에는 fallback의 값이 나타난다.
+
+```
+import React, { Suspense } from 'react';
+const Split = React.Lazy(() => import('./split'));
+
+<Suspense fallback={<div>loading...</div>}>
+  {visible && <Split />}
+</Suspense>;
+
+```
+
+### Loadable Components
+
+React.lazy와 Suspense는 서버 사이드 렌더링을 지원하지 않는다.(21.12.26 기준) 일년전에도 지원하지 않았는데 언제쯤 지원할까?? 사용법은 React.lazy와 비슷하다. 그리고 몇가지 추가 기능들이 존재한다.
+
+yarn add @loadable/component
+
+```
+import React, { useState } from "react";
+import loadable from "@loadable/component";
+
+const Split = loadable(() => import("./split"), {
+  fallback: <div>loading...</div>,
+});
+
+const App = () => {
+  const [visible, setVisible] = useState(false);
+  const onClick = () => {
+    setVisible(true);
+  };
+  const onMouseOver = () => {
+    Split.preload();
+  };
+  return (
+    <div>
+      {visible && <Split />}
+    </div>
+  );
+};
+
+export default App;
+```
+
+## context
+
+리액트에서는 context API가 존재한다.
+리액트에서는 props로 data를 넘겨준다. 그리고 이 props를 모든 컴포넌트에 넘겨줘야 한다던가 여러 곳에 적용해야 한다면 구조가 복잡해진다. 그리고 코드 확장과 유지 보수에도 문제가 생긴다. 그런 경우에 context를 이용해 관리하면 컴포넌트 트리 전체에 데이터를 제공할 수 있다. createContext로 컨텍스트를 만들고 이 컨텍스트의 Provider로 react component를 감싸주면 된다. 그리고 useContext(클래스는 조금 다름)로 데이터를 불러올 수 있다. 리액트 라우터, 리덕스, styled-components 등의 라이브러리는 conext api를 기반으로 만들어졌다.
+
+### vs redux
+
+단순한 전역 상태 관리라면 context api를 사용해도 괜찮다. 하지만 리덕스는 더욱 향상된 성능과 미들웨어, 강력한 개발자 도구, 코드의 높은 유지 보수성을 제공하기 때문에 상황에 맞게 적절히 사용하자. 물론 리덕스가 아니라 다른 상태관리 라이브러리도 마찬가지다.
+
+## 디자인 패턴
 
 ## 클래스형 vs 함수형
