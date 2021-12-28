@@ -321,6 +321,63 @@ person.hi(function () {
 });
 ```
 
+#### 헷갈리기 쉬운 bind 예제
+
+mdn에서 예제를 참고해 조금 변형해봤다. 한번 살펴보자
+
+```
+var x = 10;
+const modules = {
+  x: 20,
+  getX: function () {
+    return this.x;
+  },
+};
+
+console.log(modules.getX());
+// 1 : expected output: 20
+
+const unboundGetX = modules.getX;
+console.log(unboundGetX()); // The function gets invoked at the global scope
+// 2 : expected output: 10
+```
+
+unboundGetX라는 변수에 module.getX를 할당한다. 함수이기 때문에 참조값이 복사되고 module.getX와 unboundGetX는 정확히 일치한다. 그런데 1의 결과와 2의 결과가 다르다. 어째서 2에서는 전역 객체에서 x의 값을 가져오는 것일까?? (참고로 const로 x를 선언하면 당연히 undefined를 뱉는다. var는 함수레벨스코프이기 때문에 전역객체이고 const는 지역레벨스코프이고 전역 스코프에서 값을 할당해도 전역 객체에 저장되지 않는다)
+
+자바스크립트는 렉시컬 스코프임을 생각해보자. 함수를 어디서 선언했는지에 따라 상위 스코프를 결정한다. 어디서 호출했는지는 상관이 없다. 즉 unboundGetX 함수는 전역에서 실행을 했고 실행된 함수는 일반함수이기 때문에 this는 전역 객체를 가리키게 된다. modules.getX에서는 객체에서 객체의 메서드를 호출했다. 즉 this는 호출한 객체를 가리키게 된다. 객체의 메서드를 함수로 저장하고 객체의 this에 접근할 방법이 있을까?? 이런 경우에 bind를 사용할 수 있다.
+
+```
+const boundGetX = unboundGetX.bind(modules);
+console.log(boundGetX());
+// expected output: 20
+```
+
+#### 리액트 컴포넌트에서의 bind 사용 예시
+
+리액트에서도 마찬가지다. 클래스형 리액트 예시를 보면 꼭 bind를 해주는 부분이 있을 것이다. 위에서 말한 예시와 일치한다. 버튼의 onclick에 넣는 함수는 일반 함수에서 선언한 것이 되기 때문에 this는 전역 객체를 가리키게 된다. 그래서 보통 생성자에서 bind를 해준다. 이 귀찮은 작업을 막기위해 화살표 함수나 커링 방식을 이용하기도 한다. 하지만 커링 방식은 가독성이 떨어지고 화살표함수는 클래스에서 성능이 떨어진다. 그래서 autobind decorator라는 라이브러리를 사용하기도 한다.
+
+```
+import React from 'react';
+
+class Button extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+    };
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick() {
+    this.setState((state) => ({ count: state.count + 1 }));
+  }
+
+  render() {
+    return <button onClick={this.onClick}>+</button>;
+  }
+}
+```
+
 ## 실행 컨텍스트
 
 ### 실행 컨텍스트 정의
