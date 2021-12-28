@@ -395,11 +395,11 @@ class Button extends Component {
 
 - VariableEnvironment : 최초의 스냅샷의 개념으로 변경되는 컨텍스트 정보에 대해 업데이트를 하지 않는다.
 
-- LexicalEnvironment : envrionmentRecord 와 outerEnvironmentReference 의 객체를 가지고 있다
+- LexicalEnvironment : environmentRecord 와 outerEnvironmentReference 의 객체를 가지고 있다
 
-- ThisBinding : 상황에 따라 적절한 this를 지정한다.
+- ThisBinding : 상황에 따라 적절한 this를 지정한다.(environmentRecord 내부의 슬롯에 바인딩)
 
-#### envrionmentRecord
+#### environmentRecord
 
 현재 컨텍스트와 관련된 코드의 식별자 정보들이 저장된다.
 
@@ -408,6 +408,28 @@ class Button extends Component {
 - 함수 내부의 식별자
 
 코드가 실행되기 전에 식별자를 알기 때문에 자바스크립트에서 호이스팅이 일어난다는 말을 하는 것이다.
+
+그리고 global environmentRecord는 조금 다르다. object environment record, declarative environment record 두 record로 구성된다.
+
+##### this 바인딩
+
+environment record의 내부 슬롯에 this가 바인딩된다. 참고로 전역 environment record를 구성하는 object environment record와 declarative environment record에는 this 바인딩이 없다. this 바인딩은 전역 환경 레코드와 함수 환경 레코드에만 존재한다.
+
+##### object environment record
+
+object environment record는 var 키워드로 선언한 전역 변수와 함수 선언문으로 정의한 전역 함수, 빌트인 전역 프로퍼티와 빌트인 전역 함수, 표준 빌트인 객체를 관리한다.
+
+object environment record는 BindingObject(전역 객체)라고 부르는 객체와 연결된다.
+
+var 키워드로 선언한 전역 변수와 함수 선언문으로 정의된 전역 함수는 전역 environment record의 object environment record에 연결된 BindingObject를 통해 전역 객체의 프로퍼티와 메서드가 된다. 그리고 이때 등록된 식별자를 전역 environment record의 object environment record에서 검색하면 전역 객체의 프로퍼티를 검색하여 반환한다.
+
+이때 var는 선언 단계와 초기화 단계가 동시에 진행되기 때문에 코드 실행 단계 이전에 참조할 수 있다.
+
+##### declarative environment record
+
+declarative environment record는 let, const 키워드로 선언한 전역 변수를 관리한다.
+
+let, const 키워드로 선언한 전역 변수는 전역 객체의 프로퍼티가 되지 않고 개념적인 블록 내에 존재하게 된다고 했는데, 이때 개념적인 블록이 바로 전역 환경 레코드의 declarative environment record다. 따라서 window.y로 참조할 수 없고 const 키워드로 선언한 변수는 선언 단계와 초기화 단계가 분리되어 진행하기 때문에 일시적 사각지대가 있다.(호이스팅은 일어남)
 
 #### outerEnvironmentReference
 
@@ -421,20 +443,20 @@ ex)
 
 ```
 // 전역 컨텍스트
-var x = 1; // window에 저장(this=window)
-const y = 2; // envrionmentRecorddp에 저장
+var x = 1; // window에 저장(this=window) (object environment record의 BindingObject에 접근, window에 연결
+const y = 2; // declarative envrionmentRecord에 저장
 function foo(a) {
   // foo 컨텍스트
   var x = 10; // window에 저장(this=window)
-  const y = 20; // envrionmentRecorddp에 저장
+  const y = 20; // foo 함수의 envrionmentRecord에 저장
   function bar(b) {
     // bar 컨텍스트
-    const z = 30; // envrionmentRecorddp에 저장
+    const z = 30; // bar 함수의 envrionmentRecord에 저장
     console.log(a, b, x, y, z);
   }
   bar(2); // bar가 실행될 때 foo의 LexcicalEnvironemnt를 outerEnvironmentReference로 참조
 }
-foo(1); // foo가 실행될 때 전역 컨텍스트의의 LexcicalEnvironemnt를 outerEnvironmentReference로 참조
+foo(1); // foo가 실행될 때 전역 컨텍스트의 LexcicalEnvironemnt를 outerEnvironmentReference로 참조
 
 ```
 
