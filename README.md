@@ -811,4 +811,10 @@ end
 
 ## 프로토타입
 
+https://ms3864.tistory.com/404
+
+https://ms3864.tistory.com/329
+
+https://poiemaweb.com/js-prototype
+
 ## 객체지향
