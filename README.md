@@ -807,7 +807,144 @@ end
 
 결론 : 코드를 작성할 때는 null을 사용하는 것이 좋다. 하지만 유저 정보같이 서버에서 받아오기 전에 존재하는 상태는 undefined로 할당하는게 좋지 않을까?? 보편적으로는 null을 사용하는 것 같다.
 
+## 이터러블
+
+Symbol.iterator를 프로퍼티 키로 사용한 메서드를 직접 구현하거나 프로토타입 체인을 통해 상속 받은 Symbol.iterator 메서드를 가지고 있다면 이터러블 프로토콜을 만족하며 이터러블이다. for...of 문으로 순회할 수 있으며 스프레드 문법과 배열 디스트럭처링 할당의 대상으로 사용할 수 있다.
+
+## 이터레이터
+
+이터러블의 Symbol.iterator 메서드를 호출하면 이터레이터 프로토콜을 준수한 이터레이터를 반환한다. 이터레이터는 next 메서드를 소유하며 next 메서드를 호출하면 이터러블을 순회하며 value와 done 프로퍼티를 갖는 이터레이터 리절트 객체를 반환한다. 이터레이터 프로토콜을 준수한 객체를 이터레이터라 한다. 이터레이터는 이터러블의 요소를 탐색하기 위한 포인터 역할을 한다. next메서드는 모든 요소를 순회하게 되면 value프로퍼티는 undefined, done프로퍼티는 true가 된다.
+
+#### for...of문
+
+for of 문은 내부적으로 이터레이터의 next 메서드를 호출하여 이터러블을 순회하며 next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티 값을 for .. of 문의 변수에 할당한다. 그리고 이터레이터 리절트 객체의 done 프로퍼티 값이 false이면 이터러블의 순회를 계속하고 true이면 이터러블의 순회를 중단한다.
+
+아래는 for of문 예시와 for of문을 사용하지 않고 for of 문을 구현한 코드다.
+
+```
+for (const item of [1, 2, 3]) {
+  // item 변수에 순차적으로 1, 2, 3이 할당된다.
+  console.log(item); // 1 2 3
+}
+
+// 이터러블
+const iterable = [1, 2, 3];
+
+// 이터러블의 Symbol.iterator 메서드를 호출하여 이터레이터를 생성한다.
+const iterator = iterable[Symbol.iterator]();
+
+for (;;) {
+  // 이터레이터의 next 메서드를 호출하여 이터러블을 순회한다. 이때 next 메서드는 이터레이터 리절트 객체를 반환한다.
+  const res = iterator.next();
+
+  // next 메서드가 반환한 이터레이터 리절트 객체의 done 프로퍼티 값이 true이면 이터러블의 순회를 중단한다.
+  if (res.done) break;
+
+  // 이터레이터 리절트 객체의 value 프로퍼티 값을 item 변수에 할당한다.
+  const item = res.value;
+  console.log(item); // 1 2 3
+}
+```
+
+### 사용자 정의 이터러블
+
+직접 이터러블을 정의해보자.
+
+```
+// 피보나치 수열을 구현한 사용자 정의 이터러블을 반환하는 함수. 수열의 최대값을 인수로 전달받는다.
+const fibonacciFunc = function (max) {
+  let [pre, cur] = [0, 1];
+
+  // Symbol.iterator 메서드를 구현한 이터러블을 반환한다.
+  return {
+    [Symbol.iterator]() {
+      return {
+        next() {
+          [pre, cur] = [cur, pre + cur];
+          return { value: cur, done: cur >= max };
+        }
+      };
+    }
+  };
+};
+
+// 이터러블을 반환하는 함수에 수열의 최대값을 인수로 전달하면서 호출한다.
+for (const num of fibonacciFunc(10)) {
+  console.log(num); // 1 2 3 5 8
+}
+```
+
+만약 이터레이터를 생성하려면 이터러블의 Symbol.iterator 메서드를 호출해야 한다.
+
+이터러블이면서 이터레이터인 객체를 생성하면 Symbol.iterator 메서드를 호출하지 않아도 된다.
+
+```
+// 이터러블이면서 이터레이터인 객체를 반환하는 함수
+const fibonacciFunc = function (max) {
+  let [pre, cur] = [0, 1];
+
+  // Symbol.iterator 메서드와 next 메서드를 소유한 이터러블이면서 이터레이터인 객체를 반환
+  return {
+    [Symbol.iterator]() { return this; },
+    // next 메서드는 이터레이터 리절트 객체를 반환
+    next() {
+      [pre, cur] = [cur, pre + cur];
+      return { value: cur, done: cur >= max };
+    }
+  };
+};
+
+// iter는 이터러블이면서 이터레이터다.
+let iter = fibonacciFunc(10);
+
+// iter는 이터러블이므로 for...of 문으로 순회할 수 있다.
+for (const num of iter) {
+  console.log(num); // 1 2 3 5 8
+}
+
+// iter는 이터러블이면서 이터레이터다
+iter = fibonacciFunc(10);
+
+// iter는 이터레이터이므로 이터레이션 리절트 객체를 반환하는 next 메서드를 소유한다.
+console.log(iter.next()); // { value: 1, done: false }
+console.log(iter.next()); // { value: 2, done: false }
+console.log(iter.next()); // { value: 3, done: false }
+console.log(iter.next()); // { value: 5, done: false }
+console.log(iter.next()); // { value: 8, done: false }
+console.log(iter.next()); // { value: 13, done: true }
+```
+
+```
+// 무한 이터러블을 생성하는 함수
+const fibonacciFunc = function () {
+  let [pre, cur] = [0, 1];
+
+  return {
+    [Symbol.iterator]() { return this; },
+    next() {
+      [pre, cur] = [cur, pre + cur];
+      // 무한을 구현해야 하므로 done 프로퍼티를 생략한다.
+      return { value: cur };
+    }
+  };
+};
+
+// fibonacciFunc 함수는 무한 이터러블을 생성한다.
+for (const num of fibonacciFunc()) {
+  if (num > 10000) break;
+  console.log(num); // 1 2 3 5 8...4181 6765
+}
+
+// 배열 디스트럭처링 할당을 통해 무한 이터러블에서 3개의 요소만 취득한다.
+const [f1, f2, f3] = fibonacciFunc();
+console.log(f1, f2, f3); // 1 2 3
+```
+
+- 참고책 : 자바스크립트 딥 다이브
+
 ## 제너레이터
+
+## 래퍼객체
 
 ## 프로토타입
 
