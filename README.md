@@ -815,7 +815,7 @@ Symbol.iterator를 프로퍼티 키로 사용한 메서드를 직접 구현하�
 
 이터러블의 Symbol.iterator 메서드를 호출하면 이터레이터 프로토콜을 준수한 이터레이터를 반환한다. 이터레이터는 next 메서드를 소유하며 next 메서드를 호출하면 이터러블을 순회하며 value와 done 프로퍼티를 갖는 이터레이터 리절트 객체를 반환한다. 이터레이터 프로토콜을 준수한 객체를 이터레이터라 한다. 이터레이터는 이터러블의 요소를 탐색하기 위한 포인터 역할을 한다. next메서드는 모든 요소를 순회하게 되면 value프로퍼티는 undefined, done프로퍼티는 true가 된다.
 
-#### for...of문
+### for...of문
 
 for of 문은 내부적으로 이터레이터의 next 메서드를 호출하여 이터러블을 순회하며 next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티 값을 for .. of 문의 변수에 할당한다. 그리고 이터레이터 리절트 객체의 done 프로퍼티 값이 false이면 이터러블의 순회를 계속하고 true이면 이터러블의 순회를 중단한다.
 
@@ -833,20 +833,26 @@ const iterable = [1, 2, 3];
 // 이터러블의 Symbol.iterator 메서드를 호출하여 이터레이터를 생성한다.
 const iterator = iterable[Symbol.iterator]();
 
+// 이터러블
+const iterable = [1, 2, 3];
+
+// 이터러블의 Symbol.iterator 메서드를 호출하여 이터레이터를 생성한다.
+const iterator = iterable[Symbol.iterator]();
+
 for (;;) {
   // 이터레이터의 next 메서드를 호출하여 이터러블을 순회한다. 이때 next 메서드는 이터레이터 리절트 객체를 반환한다.
-  const res = iterator.next();
+  const { done, value } = iterator.next();
 
   // next 메서드가 반환한 이터레이터 리절트 객체의 done 프로퍼티 값이 true이면 이터러블의 순회를 중단한다.
-  if (res.done) break;
+  if (done) break;
 
   // 이터레이터 리절트 객체의 value 프로퍼티 값을 item 변수에 할당한다.
-  const item = res.value;
-  console.log(item); // 1 2 3
+  console.log(value); // 1 2 3
 }
+
 ```
 
-### 사용자 정의 이터러블
+### 사용자 정의 이터러블(피보나치)
 
 직접 이터러블을 정의해보자.
 
@@ -943,6 +949,80 @@ console.log(f1, f2, f3); // 1 2 3
 - 참고책 : 자바스크립트 딥 다이브
 
 ## 제너레이터
+
+코드 블록의 실행을 일시 중지했다가 필요한 시점에 재개할 수 있는 특수한 함수
+
+### 제너레이터와 일반 함수와 차이점
+
+1. 제너레이터 함수는 함수 호출자에게 함수 실행의 제어권을 양도할 수 있다.
+
+2. 제너레이터 함수는 함수 호출자와 함수의 상태를 주고받을 수 있다.
+
+3. 제너레이터 함수를 호출하면 제너레이터 객체를 반환한다.
+
+### 제너레이터 함수 예시
+
+```
+// 제너레이터 함수 선언문
+function* genDecFunc() {
+  yield 1;
+}
+
+// 제너레이터 함수 표현식
+const genExpFunc = function* () {
+  yield 1;
+};
+
+// 제너레이터 메서드
+const obj = {
+  * genObjMethod() {
+    yield 1;
+  }
+};
+
+// 제너레이터 클래스 메서드
+class MyClass {
+  * genClsMethod() {
+    yield 1;
+  }
+}
+
+// 화살표 함수, 생성자 함수 xxxxxxxx
+```
+
+### 제너레이터의 메서드
+
+제너레이터 객체는 next 메서드를 갖는 이터레이터이지만 이터레이터에는 없는 return, throw 메서드를 갖는다. 제너레이터 객체의 세 개의 메서드를 호출하면 다음과 같이 동작한다.
+
+1. next 메서드를 호출하면 제너레이터 함수의 yield 표현식까지 코드 블록을 실행하고 yield된 값을 value 프로퍼티 값으로, false를 done 프로퍼티 값으로 갖는 이터레이터 리절트 객체를 반환한다.
+
+2. return 메서드를 호출하면 인수로 전달받은 value 프로퍼티 값으로, true를 done 프로퍼티 값으로 갖는 이터레이터 리절트 객체를 반환한다.
+
+3. throw 메서드를 호출하면 인수로 전달받은 에러를 발생시키고 undefined를 value 프로퍼티 값으로, true를 done 프로퍼티 값으로 갖는 이터레이터 리절트 객체를 반환한다.
+
+### 제너레이터 예시(피보나치)
+
+```
+// 무한 이터러블을 생성하는 제너레이터 함수
+const infiniteFibonacci = (function* () {
+  let [pre, cur] = [0, 1];
+
+  while (true) {
+    [pre, cur] = [cur, pre + cur];
+    yield cur;
+  }
+}());
+
+// infiniteFibonacci는 무한 이터러블이다.
+for (const num of infiniteFibonacci) {
+  if (num > 10000) break;
+  console.log(num); // 1 2 3 5 8...2584 4181 6765
+}
+```
+
+### async await
+
+제너레이터보다 가독성 좋게 비동기 처리를 동기 처리처럼 구현할 수 있는 async await. 프로미스를 기반으로 동작
 
 ## 래퍼객체
 
