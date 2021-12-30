@@ -1020,9 +1020,56 @@ for (const num of infiniteFibonacci) {
 }
 ```
 
+### 제너레이터는 이터러블 객체를 편하게 사용하기 위한것??
+
+그것도 맞지만 'yield’를 사용해 제너레이터 안·밖으로 정보 교환하는 강력한 기능이 있다.
+
+```
+function* gen() {
+  // 질문을 제너레이터 밖 코드에 던지고 답을 기다립니다.
+  let result = yield "2 + 2 = ?"; // (*)
+
+  alert(result);
+}
+
+let generator = gen();
+
+let question = generator.next().value; // <-- yield는 value를 반환합니다.
+
+generator.next(4); // --> 결과를 제너레이터 안으로 전달합니다.
+```
+
+```
+function* gen() {
+  let ask1 = yield "2 + 2 = ?";
+
+  alert(ask1); // 4
+
+  let ask2 = yield "3 * 3 = ?"
+
+  alert(ask2); // 9
+}
+
+let generator = gen();
+
+alert( generator.next().value ); // "2 + 2 = ?"
+
+alert( generator.next(4).value ); // "3 * 3 = ?"
+
+alert( generator.next(9).done ); // true
+```
+
+- 참고 코드 : https://ko.javascript.info/generators
+
 ### async await
 
 제너레이터보다 가독성 좋게 비동기 처리를 동기 처리처럼 구현할 수 있는 async await. 프로미스를 기반으로 동작
+
+https://meetup.toast.com/posts/73
+
+https://medium.com/@la.place/async-await%EB%8A%94-%EC%96%B4%EB%96%BB%EA%B2%8C-%EA%B5%AC%ED%98%84%ED%95%98%EB%8A%94%EA%B0%80-fa08a3157647
+
+https://ko.javascript.info/async-iterators-generators
 
 ## 래퍼객체
 
