@@ -1073,6 +1073,12 @@ https://ko.javascript.info/async-iterators-generators
 
 ## 래퍼객체
 
+생성자 함수에 prototype이 존재하고 이를 이용할 수 있다. 생성자 함수를 사용하지 않으면 임시로 래퍼 객체를 만들어서 생성자함수(String 등등).prototype의 메서드를 상속받아 사용할 수 있다.
+
+문자열이나 숫자, 불리언 등의 원시값이 있는데도 문자열, 숫자 불리언 객체를 생성하는 String, Number, Boolean 등의 표준 빌트인 생성자 함수가 존재한다.
+
+ex) arr.sort();
+
 ## 프로토타입
 
 https://ms3864.tistory.com/404
