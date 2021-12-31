@@ -1,5 +1,7 @@
 # 자바스크립트 기본기 공부
 
+[자바스크립트의 특징](#자바스크립트의-특징)
+
 ## 자바스크립트의 특징
 
 자바스크립트는 인터프리터, 동적 타입, 프로토타입 기반 객체지향 언어이다. 웹에 기본적으로 내장되어 있어서 html, css와 함께 유일하게 웹에서 사용할 수 있는 언어다. 또한 nodejs를 이용해 서버나 cli 프로그램을 만들수도 있다.
@@ -809,6 +811,16 @@ end
 
 결론 : 코드를 작성할 때는 null을 사용하는 것이 좋다. 하지만 유저 정보같이 서버에서 받아오기 전에 존재하는 상태는 undefined로 할당하는게 좋지 않을까?? 보편적으로는 null을 사용하는 것 같다.
 
+## 프로퍼티 어트리뷰트
+
+## 프로토타입
+
+https://ms3864.tistory.com/404
+
+https://ms3864.tistory.com/329
+
+https://poiemaweb.com/js-prototype
+
 ## 이터러블
 
 Symbol.iterator를 프로퍼티 키로 사용한 메서드를 직접 구현하거나 프로토타입 체인을 통해 상속 받은 Symbol.iterator 메서드를 가지고 있다면 이터러블 프로토콜을 만족하며 이터러블이다. for...of 문으로 순회할 수 있으며 스프레드 문법과 배열 디스트럭처링 할당의 대상으로 사용할 수 있다.
@@ -1074,13 +1086,5 @@ https://ko.javascript.info/async-iterators-generators
 문자열이나 숫자, 불리언 등의 원시값이 있는데도 문자열, 숫자 불리언 객체를 생성하는 String, Number, Boolean 등의 표준 빌트인 생성자 함수가 존재한다.
 
 ex) arr.sort();
-
-## 프로토타입
-
-https://ms3864.tistory.com/404
-
-https://ms3864.tistory.com/329
-
-https://poiemaweb.com/js-prototype
 
 ## 객체지향
