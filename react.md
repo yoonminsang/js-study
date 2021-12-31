@@ -243,6 +243,12 @@ DOM 노드의 자식들을 재귀적으로 처리할 때, React는 기본적으�
 
 리액트에서 setstate는 immutable로 넣어야한다. immutable의 장점도 있지만 리액트에서는 무조건 immutable을 유지해야 한다. 리액트에서는 virtual dom을 이용해 이전과 이후 트리를 비교해서 업데이트를 한다. 리액트는 클로저를 이용해서 상태값에 접근하는데 mutable로 상태를 바꾸게 되면 이전 트리의 상태도 바뀌게 되서 업데이트가 정상적으로 작동하지 않게된다. 그래서 리액트에서는 꼭 immutable로 상태를 변경하자. immutable 라이브러리를 사용하는 것도 좋은 방법이다.
 
+## 리액트 훅스 동작원리(클로저)
+
+진짜 좋은 글이다. 기존의 클래스 형은 this와의 싸움이였다면 훅스는 클로저와의 싸움...
+
+https://hewonjeong.github.io/deep-dive-how-do-react-hooks-really-work-ko/
+
 ## 고차 컴포넌트(hoc)
 
 ## 디자인 패턴
