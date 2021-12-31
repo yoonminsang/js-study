@@ -869,6 +869,209 @@ end
 
 ## 프로퍼티 어트리뷰트
 
+내부 슬롯과 내부 메서드는 자바스크립트 엔진의 구현 알고리즘을 설명하기 위해 ECMAScript 사용에서 사용하는 의사 프로퍼티와 의사 메서드다. 예를들어 [[Prototype]] 내부 슬롯의 경우 \_\_proto\_\_를 통해 간접적으로 접근 가능
+
+자바스크립트 엔진은 프로퍼티를 생성할 때 프로퍼티의 상태를 나타내는 **프로퍼티 어트리뷰트**를 기본값으로 자동 정의
+
+---
+
+프로퍼티의 상태 : 프로퍼티의 값value, 값의 갱신 가능 여부writable, 열거 가능 여부enumerable, 재정의 가능 여부configurable
+
+- writable : false이면 value 값을 변경할 수 없는 읽기 전용 프로퍼티
+- enumerable : false이면 해당 프로퍼티는 for ... in 이나 Object.keys 메서드 등으로 열거 불가능
+- configurable : false면 삭제, 변경 불가능(단, writable이 true인 경우 value의 변경과 writable을 false로 변경 가능)
+
+프로퍼티 어트리뷰트는 내부 상태 값인 내부 슬롯 [[Value]], [[Writable]], [[Enumerable]], [[Configurable]]
+
+---
+
+Object.getOwnPropertyDescriptor 메서드로 간접 확인. 매개변수(객체의 참조, 프로퍼티 키)
+
+Object.getOwnPropertyDescriptors(객체)로 모든 프로퍼티 디스크립터 객체 반환
+
+Object.defineProperty 메서드로 프로퍼티의 어트리뷰트를 정의 가능
+
+Object.defineProperties 메서드로 여러 개의 프로퍼티 한 번에 정의 가능
+
+프로퍼티는 데이터 프로퍼티와 접근자 프로퍼티로 구분
+
+### 데이터 프로퍼티
+
+키와 값으로 구성된 일반적인 프로퍼티
+
+프로퍼티 어트리뷰트 : value, writable, enumerable, configurable
+
+### 접근자 프로퍼티
+
+자체적으로는 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 호출되는 접근자 함수로 구성된 프로퍼티다.
+
+프로퍼티 어트리뷰트 : get, set, enumerable, configurable
+
+- get : 인수가 없는 함수로, 프로퍼티를 읽을 때 동작함
+- set : 인수가 하나인 함수로, 프로퍼티에 값을 쓸 때 호출됨
+
+ex1)
+
+```
+const person = {
+  // 데이터 프로퍼티
+  firstName: 'Ungmo',
+  lastName: 'Lee',
+
+  // fullName은 접근자 함수로 구성된 접근자 프로퍼티다.
+  // getter 함수
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  // setter 함수
+  set fullName(name) {
+    // 배열 디스트럭처링 할당: "31.1 배열 디스트럭처링 할당" 참고
+    [this.firstName, this.lastName] = name.split(' ');
+  },
+};
+
+// 데이터 프로퍼티를 통한 프로퍼티 값의 참조.
+console.log(person.firstName + ' ' + person.lastName); // Ungmo Lee
+
+// 접근자 프로퍼티를 통한 프로퍼티 값의 저장
+// 접근자 프로퍼티 fullName에 값을 저장하면 setter 함수가 호출된다.
+person.fullName = 'Heegun Lee';
+console.log(person); // {firstName: "Heegun", lastName: "Lee"}
+
+// 접근자 프로퍼티를 통한 프로퍼티 값의 참조
+// 접근자 프로퍼티 fullName에 접근하면 getter 함수가 호출된다.
+console.log(person.fullName); // Heegun Lee
+
+// firstName은 데이터 프로퍼티다.
+// 데이터 프로퍼티는 [[Value]], [[Writable]], [[Enumerable]], [[Configurable]] 프로퍼티 어트리뷰트를 갖는다.
+let descriptor = Object.getOwnPropertyDescriptor(person, 'firstName');
+console.log(descriptor);
+// {value: "Heegun", writable: true, enumerable: true, configurable: true}
+
+// fullName은 접근자 프로퍼티다.
+// 접근자 프로퍼티는 [[Get]], [[Set]], [[Enumerable]], [[Configurable]] 프로퍼티 어트리뷰트를 갖는다.
+descriptor = Object.getOwnPropertyDescriptor(person, 'fullName');
+console.log(descriptor);
+// {get: ƒ, set: ƒ, enumerable: true, configurable: true}
+```
+
+ex2)
+
+```
+const person = {};
+
+// 데이터 프로퍼티 정의
+Object.defineProperty(person, 'firstName', {
+  value: 'Ungmo',
+  writable: true,
+  enumerable: true,
+  configurable: true
+});
+
+Object.defineProperty(person, 'lastName', {
+  value: 'Lee'
+});
+
+let descriptor = Object.getOwnPropertyDescriptor(person, 'firstName');
+console.log('firstName', descriptor);
+// firstName {value: "Ungmo", writable: true, enumerable: true, configurable: true}
+
+// 디스크립터 객체의 프로퍼티를 누락시키면 undefined, false가 기본값이다.
+descriptor = Object.getOwnPropertyDescriptor(person, 'lastName');
+console.log('lastName', descriptor);
+// lastName {value: "Lee", writable: false, enumerable: false, configurable: false}
+
+// [[Enumerable]]의 값이 false인 경우
+// 해당 프로퍼티는 for...in 문이나 Object.keys 등으로 열거할 수 없다.
+// lastName 프로퍼티는 [[Enumerable]]의 값이 false이므로 열거되지 않는다.
+console.log(Object.keys(person)); // ["firstName"]
+
+// [[Writable]]의 값이 false인 경우 해당 프로퍼티의 [[Value]]의 값을 변경할 수 없다.
+// lastName 프로퍼티는 [[Writable]]의 값이 false이므로 값을 변경할 수 없다.
+// 이때 값을 변경하면 에러는 발생하지 않고 무시된다.
+person.lastName = 'Kim';
+
+// [[Configurable]]의 값이 false인 경우 해당 프로퍼티를 삭제할 수 없다.
+// lastName 프로퍼티는 [[Configurable]]의 값이 false이므로 삭제할 수 없다.
+// 이때 프로퍼티를 삭제하면 에러는 발생하지 않고 무시된다.
+delete person.lastName;
+
+// [[Configurable]]의 값이 false인 경우 해당 프로퍼티를 재정의할 수 없다.
+// Object.defineProperty(person, 'lastName', { enumerable: true });
+// Uncaught TypeError: Cannot redefine property: lastName
+
+descriptor = Object.getOwnPropertyDescriptor(person, 'lastName');
+console.log('lastName', descriptor);
+// lastName {value: "Lee", writable: false, enumerable: false, configurable: false}
+
+// 접근자 프로퍼티 정의
+Object.defineProperty(person, 'fullName', {
+  // getter 함수
+  get() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  // setter 함수
+  set(name) {
+    [this.firstName, this.lastName] = name.split(' ');
+  },
+  enumerable: true,
+  configurable: true
+});
+
+descriptor = Object.getOwnPropertyDescriptor(person, 'fullName');
+console.log('fullName', descriptor);
+// fullName {get: ƒ, set: ƒ, enumerable: true, configurable: true}
+
+person.fullName = 'Heegun Lee';
+console.log(person); // {firstName: "Heegun", lastName: "Lee"}
+```
+
+### 내부 동작 [[Get]]
+
+1. 프로퍼티 키가 유효한지 확인한다. 프로퍼티 키는 문자열 또는 심벌이어야 한다. 프로퍼티 키 'fullName'은 문자열이므로 유효한 프로퍼티 키다.
+
+2. 프로토타입 체인에서 프로퍼티를 검색한다. person 객체에 fullName 프로퍼티가 존재한다.
+
+3. 검색된 fullName 프로퍼티가 데이터 프로퍼티인지 접근자 프로퍼티인지 확인한다. fullName 프로퍼티는 접근자 프로퍼티다.
+
+4. 접근자 프로퍼티 fullName의 프로퍼티 어트리뷰트 [[Get]]의 값, 즉 getter 함수를 호출하여 그 결과를 반환한다. 프로퍼티 fullName의 프로퍼티 어트리뷰트 [[Get]]의 값은 Object.getOwnPropertyDescriptor 메서드가 반환하는 프로퍼티 디스크립터 객체의 get 프로퍼티 값과 같다.(set도 유사)
+
+- getter 유용하게 사용하는 예시(age가 있는 상황에서 birthday를 추가하는 경우)
+
+```
+function User(name, birthday) {
+  this.name = name;
+  this.birthday = birthday;
+
+  // age는 현재 날짜와 생일을 기준으로 계산됩니다.
+  Object.defineProperty(this, "age", {
+    get() {
+      let todayYear = new Date().getFullYear();
+      return todayYear - this.birthday.getFullYear();
+    }
+  });
+}
+
+let john = new User("John", new Date(1992, 6, 1));
+
+alert( john.birthday ); // birthday를 사용할 수 있습니다.
+alert( john.age );      // age 역시 사용할 수 있습니다.
+```
+
+- 참조코드
+
+자바스크립트 딥다이브
+
+https://ko.javascript.info/property-accessors
+
+### 내부 메서드 [[Call]]과 [[Construct]]
+
+함수는 [[Environment]], [[FormalParameters]] 등의 내부 슬롯과 [[Call]], [[Construct]] 같은 내부 메서드를 가지고 있다. 함수가 일반 함수로서 호출되면 함수 객체의 내부 메서드 [[Call]]이 호출되고 new 연산자와 함께 생성자 함수로서 호출되면 내부 메서드 [[Construct]]가 호출된다.
+
+constructor : 함수 선언문, 함수 표현식, 클래스
+
+non-constructor : 메서드(ES6 메서드 축약 표현), 화살표 함수
+
 ## 프로토타입
 
 https://ms3864.tistory.com/404
