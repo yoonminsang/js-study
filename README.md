@@ -118,7 +118,7 @@ let과 const는 블록 레벨 스코프이다. 즉, 모든 블록에서 선언�
 함수가 아닌 곳에서 선언된 let
 
 ```
-for(var i=0;i<10;i++){
+for(let i=0;i<10;i++){
     console.log(i);
 }
 0
@@ -541,6 +541,8 @@ REST는 HTTP를 기반으로 클라이언트가 서버의 리소스에 접근하
 
 REST API의 구성 : 자원(URI(엔드포인트)), 행위(HTTP 요청 메서드), 표현(페이로드)
 
+![image](https://user-images.githubusercontent.com/57904979/147813669-de7a2958-628f-4837-b14c-9642c5f220b0.png)
+
 ### RESTful
 
 제대로 찾아보니 좀 어렵다. 기본적으로는 REST 방식을 잘 지키면 restful하다고 한다. 예를들면 행위가 post인데 데이터를 업데이트를 하거나 uri를 getpost로 구현하면 restful하지 않다. 아래에 참고한 블로그의 내용을 적어두었다. 후에 정리하겠다.
@@ -826,12 +828,6 @@ for (const item of [1, 2, 3]) {
   // item 변수에 순차적으로 1, 2, 3이 할당된다.
   console.log(item); // 1 2 3
 }
-
-// 이터러블
-const iterable = [1, 2, 3];
-
-// 이터러블의 Symbol.iterator 메서드를 호출하여 이터레이터를 생성한다.
-const iterator = iterable[Symbol.iterator]();
 
 // 이터러블
 const iterable = [1, 2, 3];
