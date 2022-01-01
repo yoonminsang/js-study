@@ -1,62 +1,64 @@
 # 자바스크립트 기본기 공부
 
-[자바스크립트의 특징](#자바스크립트의-특징)
+- [자바스크립트의 특징](#자바스크립트의-특징)
 
-[원시값-vs-객체](#원시값-vs-객체)
+- [원시값-vs-객체](#원시값-vs-객체)
 
-[스코프](#스코프)
+- [스코프](#스코프)
 
-[전역변수의-문제점](#전역변수의-문제점)
+- [전역변수의-문제점](#전역변수의-문제점)
 
-[var-let-const](#var-let-const)
+- [var-let-const](#var-let-const)
 
-[콜백함수-vs-고차함수](#콜백함수-vs-고차함수)
+- [콜백함수-vs-고차함수](#콜백함수-vs-고차함수)
 
-[this](#this)
+- [this](#this)
 
-[화살표함수](#화살표함수)
+- [화살표함수](#화살표함수)
 
-[apply-call-bind](#apply-call-bind)
+- [apply-call-bind](#apply-call-bind)
 
-[실행-컨텍스트](#실행-컨텍스트)
+- [실행-컨텍스트](#실행-컨텍스트)
 
-[클로저](#클로저)
+- [클로저](#클로저)
 
-[싱글스레드-동기](#싱글스레드-동기)
+- [싱글스레드-동기](#싱글스레드-동기)
 
-[자바스크립트-엔진과-이벤트루프](#자바스크립트-엔진과-이벤트루프)
+- [자바스크립트-엔진과-이벤트루프](#자바스크립트-엔진과-이벤트루프)
 
-[이벤트버블링-캡쳐링-위임](#이벤트버블링-캡쳐링-위임)
+- [이벤트버블링-캡쳐링-위임](#이벤트버블링-캡쳐링-위임)
 
-[AJAX(Asynchronous JavaScript and XML)](#ajaxasynchronous-javascript-and-xml)
+- [AJAX(Asynchronous JavaScript and XML)](#ajaxasynchronous-javascript-and-xml)
 
-[xmlhttprequest](#xmlhttprequest)
+- [xmlhttprequest](#xmlhttprequest)
 
-[fetch-vs-axios](#fetch-vs-axios)
+- [fetch-vs-axios](#fetch-vs-axios)
 
-[rest-api](#rest-api)
+- [rest-api](#rest-api)
 
-[프로미스](#프로미스)
+- [프로미스](#프로미스)
 
-[async-await](#async-await)
+- [async-await](#async-await)
 
-[마이크로-테스크-큐-vs-매크로-테스크-큐](#마이크로-테스크-큐-vs-매크로-테스크-큐)
+- [마이크로-테스크-큐-vs-매크로-테스크-큐](#마이크로-테스크-큐-vs-매크로-테스크-큐)
 
-[undefined-vs-null](#undefined-vs-null)
+- [undefined-vs-null](#undefined-vs-null)
 
-[프로퍼티-어트리뷰트](#프로퍼티-어트리뷰트)
+- [프로퍼티-어트리뷰트](#프로퍼티-어트리뷰트)
 
-[프로토타입](#프로토타입)
+- [프로토타입](#프로토타입)
 
-[이터러블](#이터러블)
+- [이터러블](#이터러블)
 
-[이터레이터](#이터레이터)
+- [이터레이터](#이터레이터)
 
-[제너레이터](#제너레이터)
+- [제너레이터](#제너레이터)
 
-[래퍼객체](#래퍼객체)
+- [래퍼객체](#래퍼객체)
 
-[객체지향](#객체지향)
+- [객체지향](#객체지향)
+
+---
 
 ## 자바스크립트의 특징
 
