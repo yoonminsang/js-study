@@ -11,6 +11,7 @@
 - [고차 컴포넌트(hoc)](#고차-컴포넌트hoc)
 - [디자인 패턴](#디자인-패턴)
 - [클래스형 vs 함수형](#클래스형-vs-함수형)
+- [setState 비동기](#setState-비동기)
 
 ## 리액트의 특징
 
@@ -266,3 +267,11 @@ https://hewonjeong.github.io/deep-dive-how-do-react-hooks-really-work-ko/
 ## 디자인 패턴
 
 ## 클래스형 vs 함수형
+
+## setState 비동기
+
+setState는 비동기로 동작한다. 동기적으로 동작하면 편할것같은데 말이다. setstate에서 ajax 처리를 하는 것도 아니고 settimeout 처리를 하는것도 아닌데 말이다. 조금 관점을 바꿔보자. 굉장히 짧은 시간동안 setstate 동작이 여러번 일어난다고 생각해보자. 그러면 계속해도 렌더링이 일어난다. 이런 효율성 문제로 setstate는 비동기로 동작한다. 조금 더 깊게들어가면 shouldComponentUpdate 메서드가 종료되고 render 메서드가 실행되기 직전에 처리된다.(클래스형) 참고로 모든 setstate가 처리되기 전에 컴포넌트가 렌더링되지 않는다.
+
+### setstate 동기 처리 방법
+
+일단 클래스형에서는 setstate 두번째 인자로 콜백함수를 넣어주면 상태를 업데이트하고 콜백함수를 실행한다. 그리고 componentdidupdate에서 처리하는 방법도 있다. 훅스라면 useEffect를 이용한다.
