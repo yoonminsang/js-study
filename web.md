@@ -12,6 +12,7 @@
 - [최적화](#최적화)
 - [디자인패턴](#디자인패턴)
 - [마이크로서비스 아키텍쳐](#마이크로서비스-아키텍쳐)
+- [requestAnimationFrame](#requestAnimationFrame)
 
 ## 로컬스토리지, 세션스토리지, 쿠키
 
@@ -452,3 +453,5 @@ https://hanamon.kr/%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-component%EB%9E%80/
 ## 디자인패턴
 
 ## 마이크로서비스 아키텍쳐
+
+## requestAnimationFrame

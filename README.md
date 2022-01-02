@@ -520,6 +520,8 @@ foo(1); // foo가 실행될 때 전역 컨텍스트의 LexcicalEnvironemnt를 ou
 
 ```
 
+![image](https://user-images.githubusercontent.com/57904979/147879385-29a62868-a74a-42c8-b7b7-3178339e33b7.png)
+
 참고블로그
 [https://junilhwang.github.io/TIL/Javascript/Domain/Execution-Context](https://junilhwang.github.io/TIL/Javascript/Domain/Execution-Context)
 [https://medium.com/crocusenergy/js-%EC%8B%A4%ED%96%89-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-2b8ab8da4f4](https://medium.com/crocusenergy/js-%EC%8B%A4%ED%96%89-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-2b8ab8da4f4)
