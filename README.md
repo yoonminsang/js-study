@@ -599,11 +599,27 @@ axios도 fetch와 기능적으로는 크게 다르지 않다. 하지만 몇가�
 
 ## REST API
 
-REST는 HTTP를 기반으로 클라이언트가 서버의 리소스에 접근하는 방식을 규정한 아키텍처고, REST API는 REST를 기반으로 서비스 API를 구현한 것을 의미한다.
+REST(Representational State Transfer)는 HTTP를 기반으로 클라이언트가 서버의 리소스에 접근하는 방식을 규정한 아키텍처고, REST API는 REST를 기반으로 서비스 API를 구현한 것을 의미한다.
 
 REST API의 구성 : 자원(URI(엔드포인트)), 행위(HTTP 요청 메서드), 표현(페이로드)
 
 ![image](https://user-images.githubusercontent.com/57904979/147813669-de7a2958-628f-4837-b14c-9642c5f220b0.png)
+
+### API
+
+API(Application Programming Interface, 응용 프로그램 프로그래밍 인터페이스)는 응용 프로그램에서 사용할 수 있도록, 운영 체제나 프로그래밍 언어가 제공하는 기능을 제어할 수 있게 만든 인터페이스를 뜻한다. -위키백과
+
+쉽게 말해, API는 프로그램들이 서로 상호작용하는 것을 도와주는 매개체다.
+
+#### API의 역할
+
+1. API는 서버와 데이터베이스에 대한 출입구 역할을 한다.
+
+2. API는 애플리케이션과 기기가 원활하게 통신할 수 있도록 한다.
+
+3. API는 모든 접속을 표준화한다.
+
+- api 참조 블로그 http://blog.wishket.com/api%EB%9E%80-%EC%89%BD%EA%B2%8C-%EC%84%A4%EB%AA%85-%EA%B7%B8%EB%A6%B0%ED%81%B4%EB%9D%BC%EC%9D%B4%EC%96%B8%ED%8A%B8/
 
 ### RESTful
 
