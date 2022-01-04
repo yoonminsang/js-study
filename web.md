@@ -45,6 +45,48 @@ HTTP/1.1은 기본적으로 커넥션 당 하나의 요청과 응답만 처리�
 ![image](https://user-images.githubusercontent.com/57904979/147954334-3914df19-7bd7-4bd0-a8bc-52b97024d8cc.png)
 ![image](https://user-images.githubusercontent.com/57904979/147954348-5e93ea88-5166-40b6-87c1-1272e8f59382.png)
 
+### async, defer
+
+브라우저는 html 파일을 읽다가 script 태그를 만나게 되면 dom 생성을 멈춘다. 이런 동작 방식은 다음과 같은 문제점을 야기한다.
+
+1. 스크립트에서는 스크립트 아래에 있는 DOM 요소에 접근할 수 없다. 따라서 DOM 요소에 핸들러를 추가하는 것과 같은 여러 행위가 불가능해집니다.
+
+2. 페이지 위쪽에 용량이 큰 스크립트가 있는 경우 스크립트가 페이지를 막는다. 페이지에 접속하는 사용자들은 스크립트를 다운받고 실행할 때까지 스크립트 아래쪽 페이지를 볼 수 없게 된다.
+
+3. 자바스크립트로 DOM, CSSOM을 변경할 때 리플로우, 리페인트가 일어나는데 여기서 비용이 크게 발생한다.
+
+그리고 이런 문제점을 해결하기 위해 스크립트 태그를 body 아래에 넣는 것으로 해결했다. 하지만 HTML 문서 자체가 아주 큰 경우를 가정해보자. 브라우저가 HTML 문서 전체를 다운로드 한 다음에 스크립트를 다운받게 하면 페이지가 느려진다. 이때 적용할 수 있는 속서잉 async, defer다.
+
+![image](https://user-images.githubusercontent.com/57904979/148041501-405ee806-ac1b-493c-8da0-f69529d5fab6.png)
+
+#### defer
+
+defer 속성이 있는 스크립트는 백그라운드에서 다운로드한다. 그리고 스크립트는 DOM이 준비된 후에 실행되긴 하지만 DOMContentLoaded 이벤트 발생 전에 실행된다. 또한 입력한 순서대로 실행된다.(a와 b를 defer로 순서대로 불러왔을 때 b를 먼저 불러오더라도 a, b 순서대로 실행) 참고로 외부 스크립트에서만 유효
+
+실무에선 defer를 DOM 전체가 필요한 스크립트나 실행 순서가 중요한 경우에 적용한다.
+
+![image](https://user-images.githubusercontent.com/57904979/148041527-6bd8d599-8250-4477-878a-cff7de66b767.png)
+
+#### async
+
+async 속성이 있는 스크립트는 페이지와 완전히 독립적으로 동작한다. 자바스크립트의 파싱과 실행은 자바스크립트 파일의 로드가 완료된 직후 진행되며, 이때 HTML 파싱이 중단된다. 또한 async 스크립트가 여러개 있는 경우 실행 순서도 제각각이다
+
+실무에서 async는 방문자 수 카운터나 광고 관련 스크립트같이 독립적인 스크립트에 혹은 실행 순서가 중요하지 않은 경우에 적용한다.
+
+![image](https://user-images.githubusercontent.com/57904979/148041513-bb075559-e8db-4a2b-90de-dfa696f4e47e.png)
+
+#### 요약
+
+- DOM을 따라 반드시 순서대로 실행되어야 한다면 \<script>
+- DOM이나 다른 스크립트에 의존성이 없고, 실행 순서가 중요하지 않은 경우라면 \<script async>
+- DOM이나 다른 스크립트에 의존성이 있고, 실행 순서가 중요한 경우라면 \<script defer>
+
+참조 글
+
+- https://ko.javascript.info/script-async-defer
+
+- https://wormwlrm.github.io/2021/03/01/Async-Defer-Attributes-of-Script-Tag.html
+
 ## 로컬스토리지, 세션스토리지, 쿠키
 
 ### 쿠키
