@@ -12,6 +12,7 @@
 - [디자인 패턴](#디자인-패턴)
 - [클래스형 vs 함수형](#클래스형-vs-함수형)
 - [setState 비동기](#setState-비동기)
+- [hooks 종류](#hooks-종류)
 
 ## 리액트의 특징
 
@@ -293,3 +294,89 @@ setState는 비동기로 동작한다. 동기적으로 동작하면 편할것같
 ### setstate 동기 처리 방법
 
 일단 클래스형에서는 setstate 두번째 인자로 콜백함수를 넣어주면 상태를 업데이트하고 콜백함수를 실행한다. 그리고 componentdidupdate에서 처리하는 방법도 있다. 훅스라면 useEffect를 이용한다.
+
+## hooks 종류
+
+### usestate
+
+`const [state, setState] = useState(initialState);`
+
+상태 유지 값과 그 값을 갱신하는 함수를 반환한다. State Hook을 현재의 state와 동일한 값으로 갱신하는 경우 React는 자식을 렌더링 한다거나 무엇을 실행하는 것을 회피하고 그 처리를 종료한다. (React는 Object.is 비교 알고리즘을 사용)
+
+### useEffect
+
+useEffect에 전달된 함수는 화면에 렌더링이 완료된 후에 수행된다. 두번째 배열의 요소가 변경될 때마다 재생성된다. 첫번째 콜백함수의 리턴으로 뒷정리도 가능하다.
+
+### useLayoutEffect
+
+모든 DOM 변경 후에 동기적으로 발생한다. 이것은 DOM에서 레이아웃을 읽고 동기적으로 리렌더링하는 경우에 사용된다. useLayoutEffect의 내부에 예정된 갱신은 브라우저가 화면을 그리기 이전 시점에 동기적으로 수행될 것이다. 화면 갱신 차단의 방지가 가능할 때 표준 useEffect를 먼저 사용해야 한다.
+
+- useEffect의 이펙트는 DOM이 화면에 그려진 이후에 호출된다.
+- useLayoutEffect의 이펙트는 DOM이 화면에 그려지기 전에 호출된다.
+- 렌더링할 상태가 이펙트 내에서 초기화되어야 할 경우, 사용자 경험을 위해 useLayoutEffect를 활용하자!
+
+https://merrily-code.tistory.com/46
+
+### useContext
+
+`const value = useContext(MyContext);`
+
+context 객체(React.createContext에서 반환된 값)를 받아 그 context의 현재 값을 반환한다. context의 현재 값은 트리 안에서 이 Hook을 호출하는 컴포넌트에 가장 가까이에 있는 \<MyContext.Provider>의 value prop에 의해 결정된다.
+
+useContext의 인자값은 context 그 자체여야 한다.
+
+useContext를 호출한 컴포넌트는 context 값이 변경되면 항상 리렌더링 된다. 컴포넌트를 리렌더링 하는 것에 비용이 많이 든다면, 메모이제이션을 사용하여 최적화할 수 있습니다. https://github.com/facebook/react/issues/15156#issuecomment-474590693
+
+### useReducer
+
+`const [state, dispatch] = useReducer(reducer, initialArg, init);`
+
+useState의 대체 함수다. (state, action) => newState의 형태로 reducer를 받고 dispatch 메서드와 짝의 형태로 현재 state를 반환합니다. (Redux와 비슷)
+
+다수의 하윗값을 포함하는 복잡한 정적 로직을 만드는 경우나 다음 state가 이전 state에 의존적인 경우에 보통 useState보다 useReducer를 선호한다. 또한 useReducer는 자세한 업데이트를 트리거 하는 컴포넌트의 성능을 최적화할 수 있게 하는데, 이것은 콜백 대신 dispatch를 전달 할 수 있기 때문이다. dispatch는 리렌더링될 때 변경되지 않는다. 즉 useEffect, useCallback의 의존성 목록에 포함하지 않아도 괜찮다.
+
+기본적으로 초기 state는 두번째 인자로 지정할 수 있다. 초기 state를 조금 지연해서 생성하고 싶다면 세번째 인자에 함수를 전달한다. 이것은 reducer 외부에서 초기 state를 계산하는 로직을 추출할 수 있도록 한다. 또한, 어떤 행동에 대한 대응으로 나중에 state를 재설정하는 데에도 유용하다.
+
+### useCallback
+
+```
+const memoizedCallback = useCallback(
+  () => {
+    doSomething(a, b);
+  },
+  [a, b],
+);
+```
+
+의존성이 변경되었을 때만 콜백함수가 실행된다.(메모제이션)
+
+기본적으로 리액트는 props, state, 상위 컴포넌트가 리렌더링 되면 새롭게 생성한다. 이때 변경할 필요가 없는 함수도 새롭게 생성되는데 useCallback으로 이를 막을 수 있다. 또한 자식 컴포넌트에 콜백을 전달할 때 같은 값을 전달할 수 있어서 React.memo와 함께 사용해서 최적화를 한다.
+
+useCallback(fn, deps)은 useMemo(() => fn, deps)와 같다.
+
+### useMemo
+
+의존성이 변경되었을 때에만 메모이제이션된 값을 다시 계산 한다. 모든 렌더링 시의 고비용 계산을 방지하게 해준다. useCallback과 마찬가지로 React.memo와 함께 사용된다.
+
+### useRef
+
+useRef는 .current 프로퍼티로 전달된 인자(initialValue)로 초기화된 변경 가능한 ref 객체를 반환한다. 반환된 객체는 컴포넌트의 전 생애주기를 통해 유지된다.
+
+useRef는 내용이 변경될 때 그것을 알려주지는 않는다. .current 프로퍼티를 변형하는 것이 리렌더링을 발생시키지 않는다.
+
+#### ref를 사용하는 이유
+
+리액트에서는 virtual dom을 이용한다. 그리고 ref를 사용하지 않은 dom의 접근은 실제 dom 요소에 접근한다. 리액트에서는 virtual dom을 바탕으로 dom을 그리기 때문에 virtual dom을 통해 접근하는 것이 조금더 확실하다. 또한 리액트의 생명주기도 고려해야한다.
+
+#### ref가 필요한 경우
+
+- 포커스, 텍스트 선택영역, 혹은 미디어의 재생을 관리할 때.
+- 애니메이션을 직접적으로 실행시킬 때.
+- 서드 파티 DOM 라이브러리를 React와 같이 사용할 때.
+
+https://mingule.tistory.com/61
+https://yoonjong-park.tistory.com/entry/React-useRef-%EB%8A%94-%EC%96%B8%EC%A0%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%EA%B0%80
+
+### useImperativeHandle
+
+### useDebugValue
