@@ -309,11 +309,17 @@ obj.b()
 
 obj.c()
 // {a: 10, b: ƒ, c: ƒ}
+
+const fn1=obj.b;
+fn1();
+// window
+
+const fn2=()=>obj.b();
+fn2();
+// {a: 10, b: ƒ, c: ƒ}
 ```
 
 3. 생성자 함수 : 생성자 함수가 생성한 인스턴스를 가리킨다.
-
-4. 화살표 함수 : 외부 스코프의 this를 가리킨다.
 
 ```
 function Animal(name){
@@ -324,6 +330,8 @@ function Animal(name){
 const dog=new Animal('dog')
 // Animal {name: 'dog'}
 ```
+
+4. 화살표 함수 : 외부 스코프의 this를 가리킨다.
 
 5. apply, call, bind : 인수에 의해 결정
 
